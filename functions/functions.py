@@ -14,148 +14,76 @@ def checkfiles():
                 raise
     if not os.path.isfile(path):
         with open(path, "w") as f:
-            f.write('[{"players": []}, {"autoconnect": []}]')
+            f.write('[{"players": []}, {"autoconnect": {}}]')
 
-def getautoconnexion():
-    file = open(path, "r")
-    jsondat = json.load(file)
+def initdata():
+    try:
+        file = open(path, "r")
+        jsondata = json.load(file)
 
-    if jsondat[1]["autoconnect"] == []:
+        return jsondata
+    except:
+        with open(path, "w") as f:
+            f.write('[{"players": []}, {"autoconnect": {}}]')
+        
+        return [{"players": []}, {"autoconnect": {}}]
+
+def getautoconnexion(data):
+    if data[1]["autoconnect"] == {}:
         return False
     else:
-        return jsondat[1]["autoconnect"][0]
+        return data[1]["autoconnect"]
 
-def setautoconnexion(name):
-    file = open(path, "r")
-    jsondat = json.load(file)
-    dat = jsondat
+def setautoconnexion(name, data):
+    data[1]["autoconnect"] = { "name": name }
+    jsondata = json.dumps(data)
 
-    if dat[1]["autoconnect"] == []:
-        dat[1]["autoconnect"].append({"name": name})
-        jsondata = json.dumps(dat)
+    with open(path, 'w+') as f:
+        f.write(jsondata)
+        f.close()
 
-        with open(path, 'w+') as f:
-            f.write(jsondata)
-            f.close()
-            print("The player " + name + " is now in autoconnexion !")
-            input()
-            clear()
-    else:
-        dat[1]["autoconnect"].remove(dat[1]["autoconnect"][0])
-        dat[1]["autoconnect"].append({"name": name})
-        jsondata = json.dumps(dat)
+def createplayer(name, password, data):
+    data1 = {
+        "name": name,
+        "password": password,
+        "uuid": str(uuid.uuid4()),
+        "life": 100,
+        "money": 0,
+        "level": 1,
+        "equipeditems": {"armor": {}, "weapon": {}}, 
+        "items": [{ "name": "Hands", "type": "weapon", "price": 0, "damage": 1 }]
+    }
 
-        with open(path, 'w+') as f:
-            f.write(jsondata)
-            f.close()
-            print("The player " + name + " is now in autoconnexion !")
-            input()
-            clear()
+    data[0]["players"].append(data1)
 
-def createplayer(name, password):
-    file = open(path, "r")
-    jsondat = json.load(file)
-    dat = jsondat
+    jsondata = json.dumps(data)
 
-    if [d for d in dat[0]["players"] if d['name'] in [name]] == []:
-        try:
-            file1 = open(path, "r")
-            jsondat = json.load(file1)
-            dat = jsondat
+    with open(path, 'w+') as f:
+        f.write(jsondata)
+        f.close()
 
-            data = {
-                "name": name,
-                "password": password,
-                "uuid": str(uuid.uuid4()),
-                "life": 100,
-                "money": 0,
-                "level": 1,
-                "items": [{ "name": "Hands", "type": "weapon", "price": 0, "damage": 1 }]
-            }
-
-            dat[0]["players"].append(data)
-
-            jsondata = json.dumps(dat)
-
-            with open(path, 'w+') as f:
-                f.write(jsondata)
-                f.close()
-                clear()
-                print("The player " + name + " was created !")
-                input()
-                clear()
-        except:
-            dat = [{"players": []}, {"autoconnect": []}]
-
-            data = {
-                "name": name,
-                "password": password,
-                "uuid": str(uuid.uuid4()),
-                "life": 100,
-                "level": 1,
-                "items": [{ "name": "Hands", "price": 0, "damage": 1 }]
-            }
-
-            dat[0]["players"].append(data)
-
-            jsondata = json.dumps(dat)
-
-            with open(path, 'w+') as f:
-                f.write(jsondata)
-                f.close()
-                clear()
-                print("The player " + name + " was created !")
-                input()
-                clear()
-    else:
-        clear()
-        print("The player with the name " + name + " already exist !")
-        input()
-        clear()
-
-def getplayer(name):
-    file = open(path, 'r')
-    jsondata = json.load(file)
-
-    if [d for d in jsondata[0]["players"] if d['name'] in [name]] == []:
+def getplayer(name, data):
+    if [d for d in data[0]["players"] if d['name'] in [name]] == []:
         return False
     else:
-        return [d for d in jsondata[0]["players"] if d['name'] in [name]][0]
+        return [d for d in data[0]["players"] if d['name'] in [name]][0]
 
-def removeplayer(name):
-    file = open(path, "r")
-    jsondat = json.load(file)
-    dat = jsondat
+def removeplayer(name, data):
+    data[0]["players"].remove([d for d in data[0]["players"] if d['name'] in [name]][0])
 
-    if [d for d in dat[0]["players"] if d['name'] in [name]] == []:
-        clear()
-        print("This player can't be deleted because it doesnt exist !")
-        input()
-        clear()
-    else:
-        dat[0]["players"].remove([d for d in dat[0]["players"] if d['name'] in [name]][0])
+    jsondata = json.dumps(data)
 
-        jsondata = json.dumps(dat)
-
-        with open(path, 'w+') as f:
-            f.write(jsondata)
-            f.close()
-            clear()
-            print("The player " + name + " was deleted !")
-            input()
-            clear()
+    with open(path, 'w+') as f:
+        f.write(jsondata)
+        f.close()
 
 def removeallplayers():
-    dat = [{"players": []}, {"autoconnect": []}]
+    dat = [{"players": []}, {"autoconnect": {}}]
     jsondata = json.dumps(dat)
 
     with open(path, 'w+') as f:
         f.write(jsondata)
         f.close()
-        clear()
-        print("All players was deleted !")
-        input()
-        clear()
 
 def payitem(playerdata, itemdata):
     file = open(path, "r")
@@ -220,3 +148,18 @@ def damage(playerdata, damage):
     with open(path, "w+") as f:
         f.write(jsondat)
         f.close()
+
+def changeequipeditem(playerdata, itemdata, data):
+    playerdata["equipeditems"][itemdata["type"]] = itemdata
+
+    jsondat = json.dumps(data)
+
+    with open(path, "w+") as f:
+        f.write(jsondat)
+        f.close()
+
+def checkequipeditem(playerdata, itemdata):
+    if playerdata["equipeditems"][itemdata["type"]] == itemdata:
+        return True
+    else:
+        return False
