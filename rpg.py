@@ -1,9 +1,12 @@
 import os
 from functions.functions import createplayer, getplayer, removeplayer, removeallplayers, getautoconnexion, setautoconnexion, checkfiles, initdata
 from basemenu import basemenu
+import ctypes
 
 clear = lambda: os.system('cls')
 data = []
+
+ctypes.windll.kernel32.SetConsoleTitleW('Python RPG - by 0BL1V10N (Pataxsa)')
 
 checkfiles()
 data = initdata()
@@ -14,7 +17,7 @@ while True:
     print()
     print("1- Create new player.\n2- Choose a player.\n3- Delete a player.\n4- Delete all players.\n5- Auto Connexion.\n6- Quit the game.")
     print()
-    
+
     choice = input("Please choice: ")
 
     clear()
