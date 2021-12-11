@@ -1,7 +1,7 @@
 <div id="top"></div>
 <div align="center">
   <a href="https://github.com/Pataxsa/Python-Rpg">
-    <img src="https://raw.githubusercontent.com/Pataxsa/Python-Rpg/main/Python-Rpg/assets/icon.png" alt="Logo" width="80" height="80">
+    <img src="https://raw.githubusercontent.com/Pataxsa/Python-Rpg/main/Python-Rpg/assets/icon.jpg" alt="Logo" width="80" height="80">
   </a>
 
   <h3 align="center">Python-Rpg</h3>
