@@ -12,7 +12,7 @@
     <a href="https://github.com/Pataxsa/Python-Rpg/releases/latest"><strong>-> Install the latest version <-</strong></a>
     <br />
     <br />
-    <a href="#image">View Image</a>
+    <a href="#image">View Images</a>
     ·
     <a href="https://github.com/Pataxsa/Python-Rpg/issues">Report Bug</a>
     ·
@@ -34,7 +34,7 @@
       <a href="#utility">Utility</a>
     </li>
     <li>
-      <a href="#image">Image</a>
+      <a href="#images">Images</a>
     </li>
   </ol>
 </details>
@@ -49,8 +49,10 @@
 <p>7. You can play multiplayer ! (Coming Soon)</p>
 
 
-<h2 id="image">🖼️ - Image</h2>
+<h2 id="images">🖼️ - Images</h2>
 
 [<img src="https://raw.githubusercontent.com/Pataxsa/Python-Rpg/main/assets/Mainmenu.PNG" alt="Image" width="600">](https://github.com/Pataxsa/Python-Rpg/releases/latest)
+[<img src="https://raw.githubusercontent.com/Pataxsa/Python-Rpg/main/assets/Playermenu.PNG" alt="Image" width="600">](https://github.com/Pataxsa/Python-Rpg/releases/latest)
+[<img src="https://raw.githubusercontent.com/Pataxsa/Python-Rpg/main/assets/Fight.PNG" alt="Image" width="600">](https://github.com/Pataxsa/Python-Rpg/releases/latest)
 
 <p align="right">(<a href="#top">⬆️ Back to top</a>)</p>
