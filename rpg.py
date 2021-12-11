@@ -9,6 +9,7 @@ checkfiles()
 data = initdata()
 
 while True:
+    clear()
     print("RPG - by 0BL1V10N (Pataxsa)")
     print()
     print("1- Create new player.\n2- Choose a player.\n3- Delete a player.\n4- Delete all players.\n5- Auto Connexion.\n6- Quit the game.")
