@@ -26,8 +26,13 @@ def basemenu(data, playerdata):
                     monsters = [{"name": "Basic Monster", "baselife": 4, "basedamage": 2}, {"name": "Monster", "baselife": 10, "basedamage": 3}]
                     randm = randint(0, len(monsters)-1)
                     monster = monsters[randm]
-                    monsterlife = monster["baselife"] * playerdata["level"]
-                    monsterdamage = monster["basedamage"] * playerdata["level"]
+                    if playerdata["equipeditems"]["armor"] != {}:
+                        monsterlife = monster["baselife"] * playerdata["level"]
+                        monsterdamagerl = monster["basedamage"] * playerdata["level"]
+                        monsterdamage = int(monsterdamagerl * playerdata["equipeditems"]["armor"]["damagereduction"])
+                    else:
+                        monsterlife = monster["baselife"] * playerdata["level"]
+                        monsterdamage = monster["basedamage"] * playerdata["level"]
 
                     while True:
                         clear()
@@ -35,7 +40,10 @@ def basemenu(data, playerdata):
                         print("Level - " + str(playerdata["level"]))
                         print()
                         print(playerdata["name"] + " - life: " + str(playerdata["life"]))
-                        print(monster["name"] + " - " + "life: " + str(monsterlife) + ", damage: " + str(monsterdamage))
+                        if playerdata["equipeditems"]["armor"] != {}:
+                            print(monster["name"] + " - " + "life: " + str(monsterlife) + ", damage: " + str(monsterdamagerl) + "-" + str(monsterdamagerl - monsterdamage) + " (" + str(monsterdamage) + ")")
+                        else:
+                            print(monster["name"] + " - " + "life: " + str(monsterlife) + ", damage: " + str(monsterdamage))
                         print()
 
                         choice = input("Press Enter to combat !")
