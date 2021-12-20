@@ -50,8 +50,8 @@ def createplayer(name, password, data):
         "life": 100,
         "money": 0,
         "level": 1,
-        "equipeditems": {"armor": {}, "weapon": {}}, 
-        "items": [{ "name": "Hands", "type": "weapon", "price": 0, "damage": 1 }]
+        "equipeditems": {"armor": {}, "weapon": { "name": "Hands", "type": "weapon", "price": 0, "rarity": "Common", "damage": 1 }}, 
+        "items": [{ "name": "Hands", "type": "weapon", "price": 0, "rarity": "Common", "damage": 1 }]
     }
 
     data[0]["players"].append(data1)
@@ -85,65 +85,50 @@ def removeallplayers():
         f.write(jsondata)
         f.close()
 
-def payitem(playerdata, itemdata):
-    file = open(path, "r")
-    jsondata = json.load(file)
-    name = playerdata["name"]
-    player = [d for d in jsondata[0]["players"] if d['name'] in [name]][0]
-
-    player["money"] -= itemdata["price"]
-    player["items"].append(itemdata)
+def payitem(playerdata, itemdata, data):
     playerdata["money"] -= itemdata["price"]
     playerdata["items"].append(itemdata)
-
-    jsondat = json.dumps(jsondata)
+    jsondat = json.dumps(data)
 
     with open(path, "w+") as f:
         f.write(jsondat)
         f.close()
 
-def givemoney(playerdata):
-    file = open(path, "r")
-    jsondata = json.load(file)
-    name = playerdata["name"]
-    player = [d for d in jsondata[0]["players"] if d['name'] in [name]][0]
-
-    player["money"] += 100
+def givemoney(playerdata, data):
     playerdata["money"] += 100
-    jsondat = json.dumps(jsondata)
+    jsondat = json.dumps(data)
 
     with open(path, "w+") as f:
         f.write(jsondat)
         f.close()
 
-def levelup(playerdata):
-    file = open(path, "r")
-    jsondata = json.load(file)
-    name = playerdata["name"]
-    player = [d for d in jsondata[0]["players"] if d['name'] in [name]][0]
-
-    player["level"] += 1
+def levelup(playerdata, data):
     playerdata["level"] += 1
-    jsondat = json.dumps(jsondata)
+    jsondat = json.dumps(data)
 
     with open(path, "w+") as f:
         f.write(jsondat)
         f.close()
 
-def damage(playerdata, damage):
-    file = open(path, "r")
-    jsondata = json.load(file)
-    name = playerdata["name"]
-    player = [d for d in jsondata[0]["players"] if d['name'] in [name]][0]
-
-    player["life"] -= damage
+def damage(playerdata, damage, data):
     playerdata["life"] -= damage
 
-    if player["life"] <= 0 and playerdata["life"] <= 0:
-        player["life"] = 0
+    if playerdata["life"] <= 0 and playerdata["life"] <= 0:
         playerdata["life"] = 0
+    jsondat = json.dumps(data)
 
-    jsondat = json.dumps(jsondata)
+    with open(path, "w+") as f:
+        f.write(jsondat)
+        f.close()
+
+def heal(playerdata, itemdata, data):
+    healed = playerdata["life"] + itemdata["heal"]
+    if healed >= 100:
+        playerdata["life"] = 100
+    else:
+        playerdata["life"] = healed
+    playerdata["items"].remove(itemdata)
+    jsondat = json.dumps(data)
 
     with open(path, "w+") as f:
         f.write(jsondat)
@@ -151,7 +136,6 @@ def damage(playerdata, damage):
 
 def changeequipeditem(playerdata, itemdata, data):
     playerdata["equipeditems"][itemdata["type"]] = itemdata
-
     jsondat = json.dumps(data)
 
     with open(path, "w+") as f:

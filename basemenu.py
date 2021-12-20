@@ -1,7 +1,7 @@
 import os
 import socket
 import json
-from functions.functions import payitem, givemoney, levelup, damage, changeequipeditem, checkequipeditem
+from functions.functions import payitem, givemoney, levelup, damage, changeequipeditem, checkequipeditem, heal
 from random import randint
 
 def basemenu(data, playerdata):
@@ -48,7 +48,7 @@ def basemenu(data, playerdata):
 
                         choice = input("Press Enter to combat !")
                         print(monster["name"] + " has done " + str(monsterdamage) + " damage to you")
-                        damage(playerdata, monsterdamage)
+                        damage(playerdata, monsterdamage, data)
                         if playerdata["life"] <= 0:
                             print("You are dead !")
                             input()
@@ -57,8 +57,8 @@ def basemenu(data, playerdata):
                         print(playerdata["name"] + " used the " + playerdata["equipeditems"]["weapon"]["name"] + " weapon wich caused " + str(playerdata["equipeditems"]["weapon"]["damage"]) + " damage")
                         monsterlife -= playerdata["equipeditems"]["weapon"]["damage"]
                         if monsterlife <= 0:
-                            levelup(playerdata)
-                            givemoney(playerdata)
+                            levelup(playerdata, data)
+                            givemoney(playerdata, data)
                             print()
                             print(monster["name"] + " is dead !")
                             print("You win 100 money (you have now " + str(playerdata["money"]) + " money)")
@@ -94,37 +94,51 @@ def basemenu(data, playerdata):
                 input()
                 clear()
         elif choice == "3":
+            items = []
             clear()
             print(" - Inventory - ")
             print()
             if len([d for d in playerdata["items"] if d['type'] in ["weapon"]]) > 0:
                 print("Weapons - " + str(len([d for d in playerdata["items"] if d['type'] in ["weapon"]])) + ": ")
+                count = 0
                 for i in [d for d in playerdata["items"] if d['type'] in ["weapon"]]:
-                    print(i["name"] + ", " + " damage: " + str(i["damage"]))
+                    count += 1
+                    items.append(i)
+                    print(str(count) + "- " + i["name"] + ", Price: " + str(i["price"]) + ", Rarity: " + i["rarity"] + ", damage: " + str(i["damage"]))
+                print()
 
             if len([d for d in playerdata["items"] if d['type'] in ["armor"]]) > 0:
-                print()
                 print("Armors - "+ str(len([d for d in playerdata["items"] if d['type'] in ["armor"]])) + ": ")
+                count = len([d for d in playerdata["items"] if d['type'] in ["weapon"]])
                 for i in [d for d in playerdata["items"] if d['type'] in ["armor"]]:
-                    print(i["name"] + ", " + " damagereduction: " + str(i["damagereduction"]*100).replace(".0", "") + "%")
-            print()
-            print("1- Change equiped weapon\n2- Change equiped armor")
-            print()
-            choice = input("Please choice: ")
+                    count += 1
+                    items.append(i)
+                    print(str(count) + "- " + i["name"] + ", Price: " + str(i["price"]) + ", Rarity: " + i["rarity"] + ", damagereduction: " + str(i["damagereduction"]*100).replace(".0", "") + "%")
+                print()
+
+            if len([d for d in playerdata["items"] if d['type'] in ["consumable"]]) > 0:
+                print("Consumables - "+ str(len([d for d in playerdata["items"] if d['type'] in ["consumable"]])) + ": ")
+                count = len([d for d in playerdata["items"] if d['type'] in ["weapon"]]) + len([d for d in playerdata["items"] if d['type'] in ["armor"]])
+                for i in [d for d in playerdata["items"] if d['type'] in ["consumable"]]:
+                    count += 1
+                    items.append(i)
+                    print(str(count) + "- " + i["name"] + ", Price: " + str(i["price"]) + ", Rarity: " + i["rarity"] + ", heal: " + str(i["heal"]))
+                print()
 
             try:
-                int(choice)
-                if choice == "1":
-                    clear()
-                    if len([d for d in playerdata["items"] if d['type'] in ["weapon"]]) > 0:
-                        for i in [d for d in playerdata["items"] if d['type'] in ["weapon"]]:
-                            print(i["name"] + ", " + " damage: " + str(i["damage"]))
-                        print()
-                        weapon = input("Equip a weapon: ")
-                        if checkequipeditem(playerdata, [d for d in playerdata["items"] if d['type'] in ["weapon"]][int(weapon)-1]) == False:
+                choice1 = int(input("Please choice: "))
+                clear()
+                print("Item - " + items[choice1-1]["name"])
+                print()
+                if items[choice1-1]["type"] == "weapon":
+                    print("1- Equip Weapon\n2- Weapon Stats")
+                    print()
+                    choice2 = int(input("Please choice: "))
+                    if choice2 == 1:
+                        if checkequipeditem(playerdata, items[choice1-1]) == False:
                             clear()
-                            changeequipeditem(playerdata, [d for d in playerdata["items"] if d['type'] in ["weapon"]][int(weapon)-1], data)
-                            print("Your have equiped a new weapon ! (" + [d for d in playerdata["items"] if d['type'] in ["weapon"]][int(weapon)-1]["name"] + ")")
+                            changeequipeditem(playerdata, items[choice1-1], data)
+                            print("Your have equiped a new weapon ! (" + items[choice1-1]["name"] + ")")
                             input()
                             clear()
                         else:
@@ -132,22 +146,20 @@ def basemenu(data, playerdata):
                             print("You have already this equiped item !")
                             input()
                             clear()
-                    else:
+                    elif choice2 == 2:
                         clear()
-                        print("You don't have any weapons :/")
+                        print("Name: " + items[choice1-1]["name"] + "\nPrice: " + str(items[choice1-1]["price"]) + "\nRarity: " + items[choice1-1]["rarity"] + "\nDamage: " + str(items[choice1-1]["damage"]))
                         input()
                         clear()
-                elif choice == "2":
-                    clear()
-                    if len([d for d in playerdata["items"] if d['type'] in ["armor"]]) > 0:
-                        for i in [d for d in playerdata["items"] if d['type'] in ["armor"]]:
-                            print(i["name"] + ", " + " damagereduction: " + str(i["damagereduction"]*100).replace(".0", "") + "%")
-                        print()
-                        armor = input("Equip a armor: ")
-                        if checkequipeditem(playerdata, [d for d in playerdata["items"] if d['type'] in ["armor"]][int(armor)-1]) == False:
+                elif items[choice1-1]["type"] == "armor":
+                    print("1- Equip Armor\n2- Armor Stats")
+                    print()
+                    choice2 = int(input("Please choice: "))
+                    if choice2 == 1:
+                        if checkequipeditem(playerdata, items[choice1-1]) == False:
                             clear()
-                            changeequipeditem(playerdata, [d for d in playerdata["items"] if d['type'] in ["armor"]][int(armor)-1], data)
-                            print("Your have equiped a new armor ! (" + [d for d in playerdata["items"] if d['type'] in ["armor"]][int(armor)-1]["name"] + ")")
+                            changeequipeditem(playerdata, items[choice1-1], data)
+                            print("Your have equiped a new armor ! (" + items[choice1-1]["name"] + ")")
                             input()
                             clear()
                         else:
@@ -155,9 +167,30 @@ def basemenu(data, playerdata):
                             print("You have already this equiped item !")
                             input()
                             clear()
-                    else:
+                    if choice2 == 2:
                         clear()
-                        print("You don't have any armors :/")
+                        print("Name: " + items[choice1-1]["name"] + "\nPrice: " + str(items[choice1-1]["price"]) + "\nRarity: " + items[choice1-1]["rarity"] + "\nDamagereduction: " + str(items[choice1-1]["damagereduction"]*100).replace("0.", "") + "%")
+                        input()
+                        clear()
+                elif items[choice1-1]["type"] == "consumable":
+                    print("1- Consume\n2- Consumable Stats")
+                    print()
+                    choice2 = int(input("Please choice: "))
+                    if choice2 == 1:
+                        if playerdata["life"] < 100:
+                            clear()
+                            heal(playerdata, items[choice1-1], data)
+                            print("You are healed by " + str(items[choice1-1]["heal"])  + " ! (you have now " + str(playerdata["life"]) + ")")
+                            input()
+                            clear()
+                        else:
+                            clear()
+                            print("You have the maximum life !")
+                            input()
+                            clear()
+                    if choice2 == 2:
+                        clear()
+                        print("Name: " + items[choice1-1]["name"] + "\nPrice: " + str(items[choice1-1]["price"]) + "\nRarity: " + items[choice1-1]["rarity"] + "\nHeal: " + str(items[choice1-1]["heal"]))
                         input()
                         clear()
             except:
@@ -166,26 +199,25 @@ def basemenu(data, playerdata):
             clear()
             print(" - Shop - ")
             print()
-            print("1- Weapons")
-            print("2- Armors")
+            print("1- Weapons\n2- Armors\n3- Consumables")
             print()
             category = input("Choose a category: ")
             clear()
 
             if category == "1":
-                item = [{"name": "Wooden Sword", "type": "weapon", "price": 100, "damage": 4 }, {"name": "Iron Sword", "type": "weapon", "price": 1000, "damage": 10 }, {"name": "Diamond Sword", "type": "weapon", "price": 10000, "damage": 30 }]
+                item = [{"name": "Wooden Sword", "type": "weapon", "price": 100, "rarity": "Common", "damage": 4 }, {"name": "Iron Sword", "type": "weapon", "price": 1000, "rarity": "Uncommon", "damage": 10 }, {"name": "Diamond Sword", "type": "weapon", "price": 10000, "rarity": "Rare", "damage": 30 }]
 
                 print(" - Weapons - ")
                 print()
                 for i in item:
-                    print("name: " + i["name"] + ", price: " + str(i["price"]) + ", damage: " + str(i["damage"]))
+                    print("name: " + i["name"] + ", price: " + str(i["price"]) + ", rarity: " + i["rarity"] + ", damage: " + str(i["damage"]))
                 print()
                 choiceitem = input("Choice your weapon: ")
 
                 try:
                     if playerdata["money"] >= item[int(choiceitem)-1]["price"]:
                         clear()
-                        payitem(playerdata, item[int(choiceitem)-1])
+                        payitem(playerdata, item[int(choiceitem)-1], data)
                         print("You have buy " + item[int(choiceitem)-1]["name"] + " for " + str(item[int(choiceitem)-1]["price"]))
                         input()
                         clear()
@@ -197,19 +229,19 @@ def basemenu(data, playerdata):
                 except:
                     clear()
             elif category == "2":
-                item = [{"name": "Wooden Armor", "type": "armor", "price": 1000, "damagereduction": 0.5 }, {"name": "Iron Armor", "type": "armor", "price": 4000, "damagereduction": 0.6 }, {"name": "Diamond Armor", "type": "armor", "price": 15000, "damagereduction": 0.7 }]
+                item = [{"name": "Wooden Armor", "type": "armor", "price": 1000, "rarity": "Common", "damagereduction": 0.5 }, {"name": "Iron Armor", "type": "armor", "price": 4000, "rarity": "Uncommon", "damagereduction": 0.6 }, {"name": "Diamond Armor", "type": "armor", "price": 15000, "rarity": "Rare", "damagereduction": 0.7 }]
 
                 print(" - Armors - ")
                 print()
                 for i in item:
-                    print(i["name"] + ", price: " + str(i["price"]) + ", damagereduction: " + str(i["damagereduction"]*100).replace(".0", "") + "%")
+                    print(i["name"] + ", price: " + str(i["price"]) + ", rarity: " + i["rarity"] + ", damagereduction: " + str(i["damagereduction"]*100).replace(".0", "") + "%")
                 print()
                 choiceitem = input("Choose your armor: ")
 
                 try:
                     if playerdata["money"] >= item[int(choiceitem)-1]["price"]:
                         clear()
-                        payitem(playerdata, item[int(choiceitem)-1])
+                        payitem(playerdata, item[int(choiceitem)-1], data)
                         print("You have buy " + item[int(choiceitem)-1]["name"] + " for " + str(item[int(choiceitem)-1]["price"]))
                         input()
                         clear()
@@ -220,38 +252,61 @@ def basemenu(data, playerdata):
                         clear()
                 except:
                     clear()
+            elif category == "3":
+                item = [{"name": "Apple", "type": "consumable", "price": 50, "rarity": "Common", "heal": 30}, {"name": "Healing Potion", "type": "consumable", "price": 100, "rarity": "Common", "heal": 60}, {"name": "Big Healing Potion", "type": "consumable", "price": 300, "rarity": "Uncommon", "heal": 100}]
 
+                print(" - Consumables - ")
+                print()
+                for i in item:
+                    print(i["name"] + ", price: " + str(i["price"]) + ", rarity: " + i["rarity"] + ", heal: " + str(i["heal"]))
+                print()
+                choiceitem = input("Choice a consumable: ")
+
+                try:
+                    if playerdata["money"] >= item[int(choiceitem)-1]["price"]:
+                        clear()
+                        payitem(playerdata, item[int(choiceitem)-1], data)
+                        print("You have buy " + item[int(choiceitem)-1]["name"] + " for " + str(item[int(choiceitem)-1]["price"]))
+                        input()
+                        clear()
+                    elif playerdata["money"] < item[int(choiceitem)-1]["price"]:
+                        clear()
+                        print("You can't buy " + item[int(choiceitem)-1]["name"] + " (you have just " + str(playerdata["money"]) + " money)")
+                        input()
+                        clear()
+                except:
+                    clear()
         elif choice == "5":
             clear()
             print(" - Player Stats - ")
             print()
-            print("Name: " + str(playerdata["name"]) + "\nPassword: " + str(playerdata["password"]) + "\nMoney: " + str(playerdata["money"]) +"\nLife: " + str(playerdata["life"]))
+            print("Name: " + str(playerdata["name"]) + "\nPassword: " + str(playerdata["password"]) + "\nLevel: " + str(playerdata["level"]) + "\nMoney: " + str(playerdata["money"]) +"\nLife: " + str(playerdata["life"]))
             print("EquipedItems: ")
             print()
             if playerdata["equipeditems"]["weapon"] != {}:
-                print("Weapon: " + playerdata["equipeditems"]["weapon"]["name"] + ", price: " + str(playerdata["equipeditems"]["weapon"]["price"]) + ", damage: " + str(playerdata["equipeditems"]["weapon"]["damage"]))
+                print("Weapon: " + playerdata["equipeditems"]["weapon"]["name"] + ", price: " + str(playerdata["equipeditems"]["weapon"]["price"]) + ", Rarity: " + playerdata["equipeditems"]["weapon"]["rarity"] + ", damage: " + str(playerdata["equipeditems"]["weapon"]["damage"]))
             else:
                 print("Weapon: You don't equiped an weapon !")
             print()
             if playerdata["equipeditems"]["armor"] != {}:
-                print("Armor: " + playerdata["equipeditems"]["armor"]["name"] + ", price: " + str(playerdata["equipeditems"]["armor"]["price"]) + ", damagereduction: " + str(playerdata["equipeditems"]["armor"]["damagereduction"]*100).replace(".0", "") + "%")
+                print("Armor: " + playerdata["equipeditems"]["armor"]["name"] + ", price: " + str(playerdata["equipeditems"]["armor"]["price"]) + ", Rarity: " + playerdata["equipeditems"]["armor"]["rarity"] + ", damagereduction: " + str(playerdata["equipeditems"]["armor"]["damagereduction"]*100).replace(".0", "") + "%")
             else:
                 print("Armor: You don't equiped an armor !")
             print("Items: ")
-            print()
-            print("Weapons - " + str(len([d for d in playerdata["items"] if d['type'] in ["weapon"]])) + ":")
             if len([d for d in playerdata["items"] if d['type'] in ["weapon"]]) > 0:
+                print("Weapons - " + str(len([d for d in playerdata["items"] if d['type'] in ["weapon"]])) + ":")
                 for i in [d for d in playerdata["items"] if d['type'] in ["weapon"]]:
-                    print(i["name"] + ", price: " + str(i["price"]) + ", damage: " + str(i["damage"]))
-            else:
-                print("You don't have any weapons :/")
-            print()
-            print("Armors - " + str(len([d for d in playerdata["items"] if d['type'] in ["armor"]])) + ": ")
+                    print("Name: " + i["name"] + ", Price: " + str(i["price"]) + ", Rarity: " + i["rarity"] + ", Damage: " + str(i["damage"]))
+                print()
             if len([d for d in playerdata["items"] if d['type'] in ["armor"]]) > 0:
+                print("Armors - " + str(len([d for d in playerdata["items"] if d['type'] in ["armor"]])) + ": ")
                 for i in [d for d in playerdata["items"] if d['type'] in ["armor"]]:
-                    print(i["name"] + ", price: " + str(i["price"]) + ", damagereduction: " + str(i["damagereduction"]*100).replace(".0", "") + "%")
-            else:
-                print("You don't have any armors :/")
+                    print("Name: " + i["name"] + ", Price: " + str(i["price"]) + ", Rarity: " + i["rarity"] + ", Damagereduction: " + str(i["damagereduction"]*100).replace(".0", "") + "%")
+                print()
+            if len([d for d in playerdata["items"] if d['type'] in ["consumable"]]) > 0:
+                print("Consumables - " + str(len([d for d in playerdata["items"] if d['type'] in ["consumable"]])) + ": ")
+                for i in [d for d in playerdata["items"] if d['type'] in ["consumable"]]:
+                    print("Name: " + i["name"] + ", Price: " + str(i["price"]) + ", Rarity: " + i["rarity"] + ", Heal: " + str(i["heal"]))
             input()
             clear()
         elif choice == "6":
