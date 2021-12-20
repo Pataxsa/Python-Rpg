@@ -40,13 +40,14 @@
 </details>
 
 <h2 id="utility">🔨 - Utility</h2>
-<p>1. There is a easly RPG game with a good code !</p>
+<p>1. There is a easly RPG game with a good and organized code !</p>
 <p>2. There are a easly shop system !</p>
 <p>3. The monsters fight are very simple !</p>
 <p>4. You can manage players !</p>
 <p>5. You can manage your inventory !</p>
-<p>6. There are a autoconnexion for players !</p>
-<p>7. You can play multiplayer ! (Coming Soon)</p>
+<p>6. You can connect your player quickly !</p>
+<p>7. Your players are securized ! (with passwords in json file because this game is not a public game)</p>
+<p>8. You can play multiplayer ! (Coming Soon...)</p>
 
 
 <h2 id="images">🖼️ - Images</h2>
